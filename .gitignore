@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+
+# 虚拟环境
+venv/
+.venv/
+env/
+
+# 运行时数据（含 cookie、通知密钥等敏感信息，勿提交）
+sign.db
+*.db
+*.sqlite3
+
+# 日志
+*.log
+
+# IDE / 工具
+.idea/
+.jbeval/
+.vscode/
+
+# 系统文件
+Thumbs.db
+Desktop.ini
+.DS_Store
