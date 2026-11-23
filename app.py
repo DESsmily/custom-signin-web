@@ -8,6 +8,16 @@ import logging
 import os
 import re
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+LOG_FILE = os.path.join(BASE_DIR, "checkin_log.log")
+
+# 先配置日志，确保后续 import 失败时也能留下记录
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[logging.FileHandler(LOG_FILE, encoding="utf-8"), logging.StreamHandler()],
+)
+
 from flask import Flask, jsonify, render_template, request, send_file
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -15,14 +25,6 @@ from apscheduler.triggers.cron import CronTrigger
 import db
 import checker
 import notify
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s",
-    handlers=[logging.FileHandler("checkin_log.log", encoding="utf-8"), logging.StreamHandler()],
-)
 
 app = Flask(__name__)
 scheduler = BackgroundScheduler()

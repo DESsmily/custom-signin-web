@@ -7,6 +7,9 @@ SCRIPT_NAME="app.py"
 PID_FILE="checkin.pid"
 LOG_FILE="checkin_log.log"
 
+# 统一在脚本所在目录执行，避免从其他目录启动时日志/PID 文件落到别处
+cd "$(dirname "$0")" || exit 1
+
 # 优先使用 python，找不到则尝试 python3
 if command -v python >/dev/null 2>&1; then
     PY=python
@@ -26,8 +29,14 @@ start() {
         return
     fi
     rm -f "$PID_FILE"
+    # 确保日志文件存在，并记录启动输出，启动失败时便于排查
+    touch "$LOG_FILE" 2>/dev/null || {
+        echo "❌ 无法创建日志文件 $LOG_FILE"
+        exit 1
+    }
     echo "🔧 正在启动签到管理系统..."
-    nohup "$PY" "$SCRIPT_NAME" > /dev/null 2>&1 &
+    echo "===== $(date '+%Y-%m-%d %H:%M:%S') 启动 =====" >> "$LOG_FILE"
+    nohup "$PY" "$SCRIPT_NAME" >> "$LOG_FILE" 2>&1 &
     echo $! > "$PID_FILE"
     sleep 2
     if is_running; then
@@ -36,6 +45,8 @@ start() {
     else
         rm -f "$PID_FILE"
         echo "❌ 启动失败，请查看 $LOG_FILE"
+        echo "----- 最近日志 -----"
+        tail -n 20 "$LOG_FILE" 2>/dev/null
         exit 1
     fi
 }
